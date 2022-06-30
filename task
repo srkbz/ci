@@ -22,7 +22,14 @@ def cli():
             '-p', password)
 
     @command
-    def run():
+    def gen_pipelines():
+        cmd('deno', 'run', '--check',
+            '--import-map', './src/import_map.json',
+            '--lock', './src/lock.json',
+            './src/main.ts')
+
+    @command
+    def set_pipelines():
         install_fly()
 
         current_user = json.loads(cmd(
@@ -79,6 +86,14 @@ def cli():
     @command
     def fly(*args):
         cmd(FLY_BIN, *FLY_TARGET, *args)
+
+    @command
+    def cache_deno():
+        cmd('deno', 'cache',
+            '--import-map', './src/import_map.json',
+            '--lock', './src/lock.json',
+            '--lock-write',
+            './src/main.ts')
 
     @command
     def install_fly(force=''):
