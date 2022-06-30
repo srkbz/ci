@@ -1,3 +1,6 @@
 {
-  "imports": {}
+  "imports": {
+    "std/": "https://deno.land/std@0.145.0/",
+    "yaml": "https://esm.sh/yaml@2.1.1?pin=v86"
+  }
 }

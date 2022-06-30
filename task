@@ -22,10 +22,18 @@ def cli():
             '-p', password)
 
     @command
-    def gen_pipelines():
-        cmd('deno', 'run', '--check',
+    def run():
+        gen_pipelines('check')
+        set_pipelines()
+
+    @command
+    def gen_pipelines(check=''):
+        cmd('deno', 'run', *(['--check'] if check == 'check' else []),
             '--import-map', './src/import_map.json',
             '--lock', './src/lock.json',
+            '--allow-env=NODE_DEBUG',
+            '--allow-read=./pipelines/generated',
+            '--allow-write=./pipelines/generated',
             './src/main.ts')
 
     @command
