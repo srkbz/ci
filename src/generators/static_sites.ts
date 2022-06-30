@@ -30,6 +30,7 @@ export const staticSitesGenerator = (): Pipeline[] => {
     jobs: [
       {
         name: "build",
+        public: true,
         plan: [
           {
             task: "build",
