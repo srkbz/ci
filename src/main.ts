@@ -1,10 +1,10 @@
 import YAML from "yaml";
-import { exampleGenerator } from "./generators/example.ts";
+import { staticSitesGenerator } from "./generators/static_sites.ts";
 import { dirname, join } from "std/path/mod.ts";
 import { emptyDir, ensureDir } from "std/fs/mod.ts";
 
 const pipelines = [
-  ...exampleGenerator(),
+  ...staticSitesGenerator(),
 ];
 
 const textEncoder = new TextEncoder();
@@ -19,7 +19,7 @@ for (const pipeline of pipelines) {
   );
 
   await ensureDir(dirname(pipelinePath));
-  console.log(pipelinePath);
+  console.log("Writing:", pipelinePath);
   await Deno.writeFile(
     pipelinePath,
     textEncoder.encode(YAML.stringify({
