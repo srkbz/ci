@@ -66,8 +66,8 @@ def cli():
         for pipeline_id in pipelines_to_remove:
             cmd(FLY_BIN, *FLY_TARGET, 'destroy-pipeline',
                 '--non-interactive',
-                '--team', pipeline_id[0],
-                '--pipeline', pipeline_id[1])
+                '--team', pipeline_id.split("/")[0],
+                '--pipeline', pipeline_id.split("/")[1])
 
         for team_name in teams_to_remove:
             if team_name == 'main':
