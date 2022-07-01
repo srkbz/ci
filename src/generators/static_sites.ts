@@ -21,6 +21,11 @@ const config = [
     ],
     output: "src/web/dist",
   },
+  {
+    host: "osoondo.com",
+    repo: "https://github.com/sirikon/osoondo.com.git",
+    output: "dist",
+  },
 ];
 
 export const staticSitesGenerator = (): Pipeline[] => {
@@ -53,10 +58,15 @@ export const staticSitesGenerator = (): Pipeline[] => {
               platform: "linux",
               image_resource: {
                 type: "registry-image",
-                source: {
-                  repository: "node",
-                  tag: `${site.node}-bullseye`,
-                },
+                source: site.node
+                  ? {
+                    repository: "node",
+                    tag: `${site.node}-bullseye`,
+                  }
+                  : {
+                    repository: "debian",
+                    tag: "bullseye",
+                  },
               },
               inputs: [
                 {
@@ -73,9 +83,13 @@ export const staticSitesGenerator = (): Pipeline[] => {
                     "# Enter repo",
                     "cd repo",
                     "",
-                    "# Build steps",
-                    ...site.build,
-                    "",
+                    ...(site.build
+                      ? [
+                        "# Build steps",
+                        ...site.build,
+                        "",
+                      ]
+                      : []),
                     `(cd "${site.output}" && find)`,
                   ].join("\n"),
                 ],
