@@ -2,15 +2,31 @@ export type Pipeline = {
   name: string;
   team: string;
   jobs: Job[];
+  resources?: Resource[];
+};
+
+export type Resource = {
+  name: string;
+  type: "git";
+  source: {
+    uri: string;
+    branch?: string;
+    private_key?: string;
+  };
 };
 
 export type Job = {
   name: string;
   public?: boolean;
-  plan: Task[];
+  plan: (TaskStep | GetStep)[];
 };
 
-export type Task = {
+export type GetStep = {
+  get: string;
+  trigger: boolean;
+};
+
+export type TaskStep = {
   task: string;
   config: {
     platform: "linux";
@@ -21,6 +37,9 @@ export type Task = {
         tag?: string;
       };
     };
+    inputs?: {
+      name: string;
+    }[];
     run: {
       path: string;
       args: string[];

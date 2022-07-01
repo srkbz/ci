@@ -27,11 +27,25 @@ export const staticSitesGenerator = (): Pipeline[] => {
   return config.map((site) => ({
     team: "static-sites",
     name: site.host.replace(/\./g, "-"),
+    resources: [
+      {
+        name: "repo",
+        type: "git",
+        source: {
+          uri: site.repo,
+          branch: "master",
+        },
+      },
+    ],
     jobs: [
       {
         name: "build",
         public: true,
         plan: [
+          {
+            get: "repo",
+            trigger: true,
+          },
           {
             task: "build",
             config: {
@@ -43,6 +57,11 @@ export const staticSitesGenerator = (): Pipeline[] => {
                   tag: `${site.node}-bullseye`,
                 },
               },
+              inputs: [
+                {
+                  name: "repo",
+                },
+              ],
               run: {
                 path: "bash",
                 args: [
@@ -50,9 +69,8 @@ export const staticSitesGenerator = (): Pipeline[] => {
                   [
                     "set -euo pipefail",
                     "",
-                    "# Clone",
-                    `git clone "${site.repo}" site`,
-                    "cd site",
+                    "# Enter repo",
+                    "cd repo",
                     "",
                     "# Build steps",
                     ...site.build,

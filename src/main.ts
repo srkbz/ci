@@ -23,6 +23,7 @@ for (const pipeline of pipelines) {
   await Deno.writeFile(
     pipelinePath,
     textEncoder.encode(YAML.stringify({
+      resources: pipeline.resources,
       jobs: pipeline.jobs,
     })),
   );
