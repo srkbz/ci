@@ -7,6 +7,7 @@ export type Pipeline = {
 
 export type Resource = {
   name: string;
+  icon?: string;
   type: "git";
   source: {
     uri: string;

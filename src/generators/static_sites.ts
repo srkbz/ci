@@ -30,6 +30,7 @@ export const staticSitesGenerator = (): Pipeline[] => {
     resources: [
       {
         name: "repo",
+        icon: "git",
         type: "git",
         source: {
           uri: site.repo,
