@@ -42,6 +42,9 @@ export type TaskStep = {
     inputs?: {
       name: string;
     }[];
+    outputs?: {
+      name: string;
+    }[];
     params?: Record<string, string>;
     run: {
       path: string;

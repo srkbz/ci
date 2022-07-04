@@ -1,4 +1,4 @@
-import { Pipeline } from "../core/models.ts";
+import { Pipeline, TaskStep } from "../core/models.ts";
 
 const config = [
   {
@@ -73,6 +73,52 @@ export const staticSitesGenerator = (): Pipeline[] => {
                   name: "repo",
                 },
               ],
+              outputs: [
+                {
+                  name: "payload",
+                },
+              ],
+              run: {
+                path: "bash",
+                args: [
+                  "-c",
+                  [
+                    "set -euo pipefail",
+                    "",
+                    ...(site.build
+                      ? [
+                        "# Enter repo",
+                        "ROOT=$(pwd)",
+                        "cd repo",
+                        "",
+                        "# Build steps",
+                        ...site.build,
+                        "",
+                        'cd "${ROOT}"',
+                        "",
+                      ]
+                      : []),
+                    "# Copy payload",
+                    `cp -r repo/${site.output}/* ./payload`,
+                    "",
+                  ].join("\n"),
+                ],
+              },
+            },
+          },
+          {
+            task: "deploy",
+            config: {
+              platform: "linux",
+              image_resource: {
+                type: "registry-image",
+                source: { repository: "debian", tag: "bullseye" },
+              },
+              inputs: [
+                {
+                  name: "payload",
+                },
+              ],
               params: {
                 DEPLOY_KEY: `((${
                   site.host.replace(/\./g, "_").toUpperCase()
@@ -85,22 +131,10 @@ export const staticSitesGenerator = (): Pipeline[] => {
                   [
                     "set -euo pipefail",
                     "",
-                    "apt-get update && apt-get install -y curl",
-                    "ROOT=$(pwd)",
-                    "# Enter repo",
-                    "cd repo",
+                    "apt-get update && apt-get upgrade -y && apt-get install -y curl",
                     "",
-                    ...(site.build
-                      ? [
-                        "# Build steps",
-                        ...site.build,
-                        "",
-                      ]
-                      : []),
-                    "# Deploy",
-                    'cd "${ROOT}"',
-                    `(cd "repo/${site.output}" && tar -czvf "$\{ROOT\}/site.tar.gz" ./*)`,
-                    `curl -i -F payload=@site.tar.gz "https://staticsites.srk.bz/${site.host}/$DEPLOY_KEY"`,
+                    `(cd "payload" && tar -czvf ../payload.tar.gz ./*)`,
+                    `curl --fail -LF payload=@payload.tar.gz "https://staticsites.srk.bz/${site.host}/$DEPLOY_KEY"`,
                     "",
                   ].join("\n"),
                 ],
