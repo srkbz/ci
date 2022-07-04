@@ -75,6 +75,7 @@ def cli():
                         pass
                     cmd(FLY_BIN, *FLY_TARGET, 'set-pipeline', '-n',
                         '--team', team,
+                        '-l', './vars.yml',
                         '-p', splitext(pipeline)[0],
                         '-c', join(pipeline_folder, team, pipeline))
 

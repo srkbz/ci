@@ -73,6 +73,11 @@ export const staticSitesGenerator = (): Pipeline[] => {
                   name: "repo",
                 },
               ],
+              params: {
+                DEPLOY_KEY: `((${
+                  site.host.replace(/\./g, "_").toUpperCase()
+                }_DEPLOY_KEY))`,
+              },
               run: {
                 path: "bash",
                 args: [
@@ -80,6 +85,8 @@ export const staticSitesGenerator = (): Pipeline[] => {
                   [
                     "set -euo pipefail",
                     "",
+                    "apt-get update && apt-get install -y curl",
+                    "ROOT=$(pwd)",
                     "# Enter repo",
                     "cd repo",
                     "",
@@ -90,7 +97,11 @@ export const staticSitesGenerator = (): Pipeline[] => {
                         "",
                       ]
                       : []),
-                    `(cd "${site.output}" && find)`,
+                    "# Deploy",
+                    'cd "${ROOT}"',
+                    `(cd "repo/${site.output}" && tar -czvf "$\{ROOT\}/site.tar.gz" ./*)`,
+                    `curl -i -F payload=@site.tar.gz "https://staticsites.srk.bz/${site.host}/$DEPLOY_KEY"`,
+                    "",
                   ].join("\n"),
                 ],
               },
