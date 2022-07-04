@@ -29,6 +29,7 @@ export type GetStep = {
 
 export type TaskStep = {
   task: string;
+  privileged?: boolean;
   config: {
     platform: "linux";
     image_resource: {
