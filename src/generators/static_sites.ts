@@ -1,4 +1,4 @@
-import { Pipeline, TaskStep } from "../core/models.ts";
+import { Pipeline } from "../core/models.ts";
 
 const config = [
   {
