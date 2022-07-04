@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import json
-from os import listdir
+import requests
+from itertools import chain
+from os import listdir, environ
 from os.path import exists, join, splitext
 
 CONCOURSE_ADDRESS = 'https://ci.srk.bz'
@@ -41,6 +43,19 @@ def cli():
     def set_pipelines():
         install_fly()
 
+        vars_auth = environ['VARS_AUTH']
+        [vars_creds, vars_host] = vars_auth.split('@')
+        [vars_username, vars_password] = vars_creds.split(':')
+
+        vars_jwt = requests.post(f'https://{vars_host}/api/login', json={
+            'username': vars_username,
+            'password': vars_password
+        }).text
+
+        vars_data = json.loads(json.loads(requests.get(f'https://{vars_host}/api/resources/ci/vars.json', cookies={
+            "auth": vars_jwt
+        }).text)['content'])
+
         current_user = json.loads(cmd(
             FLY_BIN, *FLY_TARGET, 'userinfo', '--json', stdout=subprocess.PIPE).stdout)["name"]
 
@@ -76,7 +91,7 @@ def cli():
                         pass
                     cmd(FLY_BIN, *FLY_TARGET, 'set-pipeline', '-n',
                         '--team', team,
-                        '-l', './vars.yml',
+                        *chain(*(['--var', f'{k}={v}'] for k, v in vars_data.items())),
                         '-p', splitext(pipeline)[0],
                         '-c', join(pipeline_folder, team, pipeline))
 
