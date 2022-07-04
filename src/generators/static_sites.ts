@@ -54,7 +54,6 @@ export const staticSitesGenerator = (): Pipeline[] => {
           },
           {
             task: "build",
-            privileged: true,
             config: {
               platform: "linux",
               image_resource: {
