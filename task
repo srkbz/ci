@@ -3,6 +3,7 @@ import json
 from os import listdir
 from os.path import exists, join, splitext
 
+CONCOURSE_ADDRESS = 'https://ci.srk.bz'
 FLY_BIN = './tools/fly/fly'
 FLY_TARGET = ['-t', 'srkbz-ci']
 PIPELINE_FOLDERS = [
@@ -17,7 +18,7 @@ def cli():
     def login(username, password):
         install_fly()
         cmd(FLY_BIN, *FLY_TARGET, 'login',
-            '-c', 'https://ci.srk.bz',
+            '-c', CONCOURSE_ADDRESS,
             '-u', username,
             '-p', password)
 
@@ -114,12 +115,12 @@ def cli():
             """)
         if exists('./tools/fly'):
             return
-        cmd('bash', '-c', """
+        cmd('bash', '-c', f"""
             set -euo pipefail
 
             mkdir -p tools/fly
             cd tools/fly
-            wget -O fly "https://ci.srk.bz/api/v1/cli?arch=amd64&platform=linux"
+            wget -O fly "{CONCOURSE_ADDRESS}/api/v1/cli?arch=amd64&platform=linux"
             chmod +x fly
         """)
 
