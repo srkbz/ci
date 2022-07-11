@@ -29,10 +29,11 @@ const config: Site[] = [
     repo: "https://github.com/sirikon/astenagusia.git",
     node: "16.15.1",
     build: [
+      "cd web",
       "yarn",
       "yarn build",
     ],
-    output: "src/web/dist",
+    output: "web/dist",
   },
   {
     host: "osoondo.com",
